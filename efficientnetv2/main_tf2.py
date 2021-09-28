@@ -174,7 +174,7 @@ def main(_) -> None:
         weight_decay=config.train.weight_decay)
 
     if config.train.ft_init_ckpt:  # load pretrained ckpt for finetuning.
-      model(tf.keras.Input([None, None, 3]))
+      model(tf.keras.Input([None, None, 1]))
       ckpt = config.train.ft_init_ckpt
       utils.restore_tf2_ckpt(model, ckpt, exclude_layers=('_fc', 'optimizer'))
 

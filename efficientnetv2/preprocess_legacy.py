@@ -65,7 +65,7 @@ def distorted_bounding_box_crop(image_bytes,
     offset_y, offset_x, _ = tf.unstack(bbox_begin)
     target_height, target_width, _ = tf.unstack(bbox_size)
     crop_window = tf.stack([offset_y, offset_x, target_height, target_width])
-    image = tf.image.decode_and_crop_jpeg(image_bytes, crop_window, channels=3)
+    image = tf.image.decode_and_crop_jpeg(image_bytes, crop_window, channels=1)
 
     return image
 
@@ -122,7 +122,7 @@ def _decode_and_center_crop(image_bytes, image_size, resize_method=None):
   offset_width = ((image_width - padded_center_crop_size) + 1) // 2
   crop_window = tf.stack([offset_height, offset_width,
                           padded_center_crop_size, padded_center_crop_size])
-  image = tf.image.decode_and_crop_jpeg(image_bytes, crop_window, channels=3)
+  image = tf.image.decode_and_crop_jpeg(image_bytes, crop_window, channels=1)
   image = _resize_image(image, image_size, resize_method)
   return image
 
@@ -160,7 +160,7 @@ def preprocess_for_train(image_bytes,
   """
   image = _decode_and_random_crop(image_bytes, image_size, resize_method)
   image = _flip(image)
-  image = tf.reshape(image, [image_size, image_size, 3])
+  image = tf.reshape(image, [image_size, image_size, 1])
 
   if augment_name:
     logging.info('Apply AutoAugment policy %s', augment_name)
@@ -195,7 +195,7 @@ def preprocess_for_eval(image_bytes,
     A preprocessed image `Tensor`.
   """
   image = _decode_and_center_crop(image_bytes, image_size, resize_method)
-  image = tf.reshape(image, [image_size, image_size, 3])
+  image = tf.reshape(image, [image_size, image_size, 1])
   return image
 
 
@@ -236,9 +236,10 @@ def preprocess_image(image_bytes,
     image = preprocess_for_eval(image_bytes, image_size, resize_method)
 
   # Normalize images.
+  # https://stackoverflow.com/questions/65699020/calculate-standard-deviation-for-grayscale-imagenet-pixel-values-with-rotation-m/65717887#65717887
   image = tf.image.convert_image_dtype(image, dtype=image_dtype or tf.float32)
-  mean_rgb = [0.485 * 255, 0.456 * 255, 0.406 * 255]
-  stddev_rgb = [0.229 * 255, 0.224 * 255, 0.225 * 255]
-  image -= tf.constant(mean_rgb, shape=(1, 1, 3), dtype=image.dtype)
-  image /= tf.constant(stddev_rgb, shape=(1, 1, 3), dtype=image.dtype)
+  mean_bw = [0.445 * 255]
+  stddev_bw = [0.269 * 255]
+  image -= tf.constant(mean_bw, shape=(1, 1, 1), dtype=image.dtype)
+  image /= tf.constant(stddev_bw, shape=(1, 1, 1), dtype=image.dtype)
   return image

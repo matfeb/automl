@@ -186,7 +186,7 @@ class ImageNetInput():
       a tensor representing a null image.
     """
     del data  # Unused since output is constant regardless of input
-    return tf.zeros([self.image_size, self.image_size, 3], self.image_dtype)
+    return tf.zeros([self.image_size, self.image_size, 1], self.image_dtype)
 
   def cutmix_mask(self, alpha, h, w):
     """Returns image mask for CutMix."""

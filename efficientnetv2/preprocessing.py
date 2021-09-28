@@ -37,7 +37,7 @@ def preprocess_for_train(image,
         use_image_if_no_bounding_boxes=True)
     image = tf.slice(image, begin, size)
   # resize
-  image.set_shape([None, None, 3])
+  image.set_shape([None, None, 1])
   image = tf.image.resize(image, [image_size, image_size])
   # flip
   if 'flip' in transformations:
@@ -66,7 +66,7 @@ def preprocess_for_eval(image, image_size, transformations=None):
         (ratio * tf.cast(tf.minimum(height, width), tf.float32)), tf.int32)
     y, x = (height - crop_size) // 2, (width - crop_size) // 2
     image = tf.image.crop_to_bounding_box(image, y, x, crop_size, crop_size)
-  image.set_shape([None, None, 3])
+  image.set_shape([None, None, 1])
   return tf.image.resize(image, [image_size, image_size])
 
 
@@ -81,7 +81,7 @@ def preprocess_for_finetune(image,
   # normalize
   mean, std = 0.5, 0.5
   image = (tf.cast(image, tf.float32) / 255.0 - mean) / std
-  image.set_shape([None, None, 3])
+  image.set_shape([None, None, 1])
   image = tf.image.resize(image, [image_size, image_size])
 
   if is_training:
@@ -139,7 +139,7 @@ def preprocess_image(image,
                                               ra_num_layers, ra_magnitude)
 
   is_raw = (image.dtype == tf.string)
-  image = tf.image.decode_image(image, channels=3) if is_raw else image
+  image = tf.image.decode_image(image, channels=1) if is_raw else image
 
   if augname and augname.startswith('ft'):
     image = preprocess_for_finetune(image, image_size, is_training, augname,

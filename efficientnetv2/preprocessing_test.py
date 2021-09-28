@@ -23,7 +23,7 @@ class PreprocessingTest(tf.test.TestCase, parameterized.TestCase):
 
   @parameterized.parameters('effnetv1_autoaug', 'effnetv1_randaug', None)
   def test_preprocessing_legacy(self, augname):
-    image = tf.zeros((300, 300, 3), dtype=tf.float32)
+    image = tf.zeros((300, 300, 1), dtype=tf.float32)
     try:
       preprocessing.preprocess_image(image, 224, False, None, augname)
     except tf.errors.InvalidArgumentError as e:
@@ -32,7 +32,7 @@ class PreprocessingTest(tf.test.TestCase, parameterized.TestCase):
 
   @parameterized.parameters('autoaug', 'randaug', 'ft', 'ft_autoaug', None)
   def test_preprocessing(self, augname):
-    image = tf.zeros((300, 300, 3), dtype=tf.float32)
+    image = tf.zeros((300, 300, 1), dtype=tf.float32)
     preprocessing.preprocess_image(image, 224, True, None, augname)
 
 

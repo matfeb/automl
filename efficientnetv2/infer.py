@@ -96,7 +96,7 @@ def tf2_benchmark():
 
   batch_size = FLAGS.batch_size
   data_dtype = tf.float16 if FLAGS.mixed_precision else tf.float32
-  imgs = tf.ones((batch_size, isize, isize, 3), dtype=data_dtype)
+  imgs = tf.ones((batch_size, isize, isize, 1), dtype=data_dtype)
 
   @tf.function
   def f(x):
@@ -128,7 +128,7 @@ def tf1_benchmark():
     run_metadata = tf1.RunMetadata()
     isize = FLAGS.image_size or model.cfg.eval.isize
     data_dtype = tf.float16 if FLAGS.mixed_precision else tf.float32
-    inputs = tf.ones((batch_size, isize, isize, 3), data_dtype)
+    inputs = tf.ones((batch_size, isize, isize, 1), data_dtype)
     output = model(inputs, training=False)
     sess.run(tf1.global_variables_initializer())
 
@@ -159,7 +159,7 @@ def tf1_export_ema_ckpt():
     model = effnetv2_model.EffNetV2Model(FLAGS.model_name, FLAGS.hparam_str)
     batch_size = FLAGS.batch_size
     isize = FLAGS.image_size or model.cfg.eval.isize
-    inputs = tf.ones((batch_size, isize, isize, 3), tf.float32)
+    inputs = tf.ones((batch_size, isize, isize, 1), tf.float32)
     _ = model(inputs, training=False)
     sess.run(tf1.global_variables_initializer())
     if tf.io.gfile.isdir(FLAGS.model_dir):

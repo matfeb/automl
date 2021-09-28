@@ -46,7 +46,7 @@ def main(_):
       include_top=True,
       pretrained=FLAGS.model_dir or True)
   # Use call (not build) to match the namescope: tensorflow issues/29576
-  model(tf.ones([1, 224, 224, 3]), False)
+  model(tf.ones([1, 224, 224, 1]), False)
   if FLAGS.model_dir:
     ckpt = FLAGS.model_dir
     if tf.io.gfile.isdir(ckpt):
@@ -55,7 +55,7 @@ def main(_):
   model.summary()
 
   fff = tf.function(model).get_concrete_function(
-      tf.TensorSpec([1, 224, 224, 3], tf.float32))
+      tf.TensorSpec([1, 224, 224, 1], tf.float32))
 
   frozen_func, graph_def = convert_variables_to_constants_v2_as_graph(fff)
 

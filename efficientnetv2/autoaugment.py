@@ -162,7 +162,7 @@ def cutout(image, pad_size, replace=0):
       tf.zeros(cutout_shape, dtype=image.dtype),
       padding_dims, constant_values=1)
   mask = tf.expand_dims(mask, -1)
-  mask = tf.tile(mask, [1, 1, 3])
+  mask = tf.tile(mask, [1, 1, 1])
   image = tf.where(
       tf.equal(mask, 0),
       tf.ones_like(image, dtype=image.dtype) * replace,
@@ -314,9 +314,7 @@ def autocontrast(image):
   # Assumes RGB for now.  Scales each channel independently
   # and then stacks the result.
   s1 = scale_channel(image[:, :, 0])
-  s2 = scale_channel(image[:, :, 1])
-  s3 = scale_channel(image[:, :, 2])
-  image = tf.stack([s1, s2, s3], 2)
+  image = tf.stack([s1], 2)
   return image
 
 
@@ -331,7 +329,7 @@ def sharpness(image, factor):
       [[1, 1, 1], [1, 5, 1], [1, 1, 1]], dtype=tf.float32,
       shape=[3, 3, 1, 1]) / 13.
   # Tile across channel dimension.
-  kernel = tf.tile(kernel, [1, 1, 3, 1])
+  kernel = tf.tile(kernel, [1, 1, 1, 1])
   strides = [1, 1, 1, 1]
   degenerate = tf.nn.depthwise_conv2d(
       image, kernel, strides, padding='VALID', rate=[1, 1])
@@ -383,9 +381,7 @@ def equalize(image):
   # Assumes RGB for now.  Scales each channel independently
   # and then stacks the result.
   s1 = scale_channel(image, 0)
-  s2 = scale_channel(image, 1)
-  s3 = scale_channel(image, 2)
-  image = tf.stack([s1, s2, s3], 2)
+  image = tf.stack([s1], 2)
   return image
 
 
@@ -426,7 +422,7 @@ def unwrap(image, replace):
   flattened_image = tf.reshape(image, [-1, image_shape[2]])
 
   # Find all pixels where the last channel is zero.
-  alpha_channel = flattened_image[:, 3]
+  alpha_channel = flattened_image[:, 1]
 
   replace = tf.concat([replace, tf.ones([1], image.dtype)], 0)
 
@@ -437,7 +433,7 @@ def unwrap(image, replace):
       flattened_image)
 
   image = tf.reshape(flattened_image, image_shape)
-  image = tf.slice(image, [0, 0, 0], [image_shape[0], image_shape[1], 3])
+  image = tf.slice(image, [0, 0, 0], [image_shape[0], image_shape[1], 1])
   return image
 
 
@@ -597,7 +593,7 @@ def build_and_apply_nas_policy(policies, image,
     A version of image that now has data augmentation applied to it based on
     the `policies` pass into the function.
   """
-  replace_value = [128, 128, 128]
+  replace_value = [128]
 
   # func is the string name of the augmentation function, prob is the
   # probability of applying the operation and level is the parameter associated
@@ -677,7 +673,7 @@ def distort_image_with_randaugment(image, num_layers, magnitude):
   Returns:
     The augmented version of `image`.
   """
-  replace_value = [128] * 3
+  replace_value = [128] * 1
   logging.info('Using RandAug.')
   augmentation_params = hparams.Config(cutout_const=40, translate_const=100)
   available_ops = [

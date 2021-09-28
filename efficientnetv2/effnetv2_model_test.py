@@ -29,7 +29,7 @@ class EffNetV2ModelTest(tf.test.TestCase, parameterized.TestCase):
                                   ('v1_b5', 'efficientnet-b5', 30562520),
                                   ('v1_b6', 'efficientnet-b6', 43265136))
   def test_effnetv1(self, model_name, expected_params):
-    images = tf.zeros((1, 224, 224, 3), dtype=tf.float32)
+    images = tf.zeros((1, 224, 224, 1), dtype=tf.float32)
     model = effnetv2_model.EffNetV2Model(model_name)
     _ = model(images)
     self.assertEqual(model.count_params(), expected_params)
@@ -43,7 +43,7 @@ class EffNetV2ModelTest(tf.test.TestCase, parameterized.TestCase):
                                   ('l', 'efficientnetv2-l', 119027848),
                                   ('xl', 'efficientnetv2-xl', 208896832))
   def test_effnetv2(self, model_name, expected_params):
-    images = tf.zeros((10, 224, 224, 3), dtype=tf.float32)
+    images = tf.zeros((10, 224, 224, 1), dtype=tf.float32)
     model = effnetv2_model.EffNetV2Model(model_name)
     _ = model(images)
     self.assertEqual(model.count_params(), expected_params)

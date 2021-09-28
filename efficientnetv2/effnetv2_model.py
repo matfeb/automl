@@ -575,7 +575,7 @@ class EffNetV2Model(tf.keras.Model):
     else:
       self._fc = None
 
-  def summary(self, input_shape=(224, 224, 3), **kargs):
+  def summary(self, input_shape=(224, 224, 1), **kargs):
     x = tf.keras.Input(shape=input_shape)
     model = tf.keras.Model(inputs=[x], outputs=self.call(x, training=True))
     return model.summary()
@@ -680,7 +680,7 @@ def get_model(model_name,
     A single tensor if with_endpoints if False; otherwise, a list of tensor.
   """
   net = EffNetV2Model(model_name, model_config, include_top, **kwargs)
-  net(tf.keras.Input(shape=(None, None, 3)),
+  net(tf.keras.Input(shape=(None, None, 1)),
       training=training,
       with_endpoints=with_endpoints)
 
